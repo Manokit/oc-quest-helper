@@ -51,4 +51,34 @@ public class WidgetDetails
 		childID = pair.getRight();
 		childChildID = -1;
 	}
+
+	public int getGroupId()
+	{
+		return groupID;
+	}
+
+	public int getGroupID()
+	{
+		return groupID;
+	}
+
+	public int getChildId()
+	{
+		return childID;
+	}
+
+	public int getChildID()
+	{
+		return childID;
+	}
+
+	public int getChildChildId()
+	{
+		return childChildID;
+	}
+
+	public int getChildChildID()
+	{
+		return childChildID;
+	}
 }

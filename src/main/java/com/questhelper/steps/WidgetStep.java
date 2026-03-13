@@ -61,6 +61,11 @@ public class WidgetStep extends DetailedQuestStep
 		this.widgetDetails.addAll(Arrays.asList(widgetDetails));
 	}
 
+	public List<WidgetDetails> getWidgetDetails()
+	{
+		return List.copyOf(widgetDetails);
+	}
+
 	public void addExtraWidgetOverlayHintFunction(BiConsumer<Graphics2D, QuestHelperPlugin> function) {
 		this.extraWidgetOverlayHintFunctions.add(function);
 	}

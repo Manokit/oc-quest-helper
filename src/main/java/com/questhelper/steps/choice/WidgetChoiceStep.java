@@ -158,6 +158,61 @@ public class WidgetChoiceStep
 		this.varbitValueToAnswer = varbitValueToAnswer;
 	}
 
+	public int getChildId()
+	{
+		return childId;
+	}
+
+	public int getChoiceById()
+	{
+		return choiceById;
+	}
+
+	public String getExpectedTextInWidget()
+	{
+		return expectedTextInWidget;
+	}
+
+	public Pattern getPattern()
+	{
+		return pattern;
+	}
+
+	public List<String> getExcludedStrings()
+	{
+		return excludedStrings == null ? null : List.copyOf(excludedStrings);
+	}
+
+	public int getExcludedGroupId()
+	{
+		return excludedGroupId;
+	}
+
+	public int getExcludedChildId()
+	{
+		return excludedChildId;
+	}
+
+	public int getPackedWidgetId()
+	{
+		return groupId << 16 | childId;
+	}
+
+	public int getVarbitId()
+	{
+		return varbitId;
+	}
+
+	public Map<Integer, String> getVarbitValueToAnswer()
+	{
+		return varbitValueToAnswer;
+	}
+
+	public boolean shouldNumber()
+	{
+		return shouldNumber;
+	}
+
 	public void addExclusion(int excludedGroupId, int excludedChildId, String excludedString)
 	{
 		this.excludedStrings = Collections.singletonList(excludedString);
@@ -170,6 +225,11 @@ public class WidgetChoiceStep
 		this.excludedStrings = Arrays.asList(excludedStrings);
 		this.excludedGroupId = excludedGroupId;
 		this.excludedChildId = excludedChildId;
+	}
+
+	public boolean shouldNumberChoices()
+	{
+		return shouldNumber;
 	}
 
 	public void highlightChoice(Client client)

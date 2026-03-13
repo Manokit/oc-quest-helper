@@ -123,4 +123,14 @@ public class DigStep extends DetailedQuestStep
 		/// Highlight the spade whenever the player is standing on the target tile
 		OnTile,
 	}
+
+	public ItemRequirement getSpadeRequirement()
+	{
+		return spade;
+	}
+
+	public WhenToHighlight getWhenToHighlight()
+	{
+		return whenToHighlight;
+	}
 }

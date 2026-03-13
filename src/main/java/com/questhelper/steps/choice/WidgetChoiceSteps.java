@@ -29,6 +29,7 @@ import net.runelite.api.Client;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 public class WidgetChoiceSteps
 {
@@ -43,6 +44,11 @@ public class WidgetChoiceSteps
 	public void addChoice(WidgetChoiceStep choice)
 	{
 		choices.add(choice);
+	}
+
+	public List<WidgetChoiceStep> getChoicesView()
+	{
+		return Collections.unmodifiableList(choices);
 	}
 
 	public void checkChoices(Client client)

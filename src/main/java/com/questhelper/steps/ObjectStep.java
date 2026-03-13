@@ -47,6 +47,7 @@ import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import static com.questhelper.QuestHelperConfig.ObjectHighlightStyle.CLICK_BOX;
@@ -131,6 +132,24 @@ public class ObjectStep extends DetailedQuestStep
 		}
 
 		return newStep;
+	}
+
+	public int getObjectID()
+	{
+		return objectID;
+	}
+
+	public List<Integer> getAlternateObjectIDs()
+	{
+		return Collections.unmodifiableList(alternateObjectIDs);
+	}
+
+	public List<Integer> getAllObjectIDs()
+	{
+		List<Integer> ids = new ArrayList<>();
+		ids.add(objectID);
+		ids.addAll(alternateObjectIDs);
+		return Collections.unmodifiableList(ids);
 	}
 
 	@Override
@@ -249,10 +268,28 @@ public class ObjectStep extends DetailedQuestStep
 		return this;
 	}
 
+	public int getObjectId()
+	{
+		return objectID;
+	}
+
+	public List<Integer> getAlternateObjectIds()
+	{
+		return Collections.unmodifiableList(alternateObjectIDs);
+	}
+
 	public ObjectStep addAlternateObjects(Collection<Integer> alternateObjectIDs)
 	{
 		this.alternateObjectIDs.addAll(alternateObjectIDs);
 		return this;
+	}
+
+	public List<Integer> getAllObjectIds()
+	{
+		List<Integer> ids = new ArrayList<>();
+		ids.add(objectID);
+		ids.addAll(alternateObjectIDs);
+		return ids;
 	}
 
 	@Subscribe

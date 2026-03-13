@@ -518,6 +518,16 @@ public abstract class QuestStep implements Module
 		return this;
 	}
 
+	public int getIconItemId()
+	{
+		return iconItemID;
+	}
+
+	public int getIconItemIdHint()
+	{
+		return iconItemID;
+	}
+
 	public void makeWorldOverlayHint(Graphics2D graphics, QuestHelperPlugin plugin)
 	{
 	}

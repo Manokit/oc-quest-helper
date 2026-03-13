@@ -37,6 +37,11 @@ public class DialogChoiceChange extends DialogChoiceStep
 		this.textChange = textChange;
 	}
 
+	public String getTextChange()
+	{
+		return textChange;
+	}
+
 	@Override
 	protected void highlightText(Widget text, int option)
 	{

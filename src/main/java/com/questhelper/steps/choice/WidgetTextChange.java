@@ -38,6 +38,11 @@ public class WidgetTextChange extends WidgetChoiceStep
 		this.textChange = textChange;
 	}
 
+	public String getTextChange()
+	{
+		return textChange;
+	}
+
 	@Override
 	public void highlightChoice(Client client)
 	{

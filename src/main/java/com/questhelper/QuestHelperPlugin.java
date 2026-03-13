@@ -28,6 +28,7 @@ package com.questhelper;
 import com.google.inject.Binder;
 import com.google.inject.Injector;
 import com.google.inject.Module;
+import com.questhelper.oc.OCQuestHelperService;
 import com.google.inject.Provides;
 import com.questhelper.bank.banktab.BankTabItems;
 import com.questhelper.bank.banktab.PotionStorage;
@@ -60,12 +61,14 @@ import net.runelite.client.events.ConfigChanged;
 import net.runelite.client.events.RuneScapeProfileChanged;
 import net.runelite.client.game.ItemManager;
 import net.runelite.client.game.SkillIconManager;
+import net.runelite.client.input.KeyManager;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.plugins.bank.BankSearch;
 import net.runelite.client.ui.ClientToolbar;
 import net.runelite.client.ui.NavigationButton;
 import net.runelite.client.ui.components.colorpicker.ColorPickerManager;
+import net.runelite.client.util.HotkeyListener;
 import net.runelite.client.util.Text;
 
 import javax.annotation.Nullable;
@@ -96,6 +99,9 @@ public class QuestHelperPlugin extends Plugin
 
 	@Inject
 	private ClientToolbar clientToolbar;
+
+	@Inject
+	private KeyManager keyManager;
 
 	@Getter
 	@Inject
@@ -160,11 +166,23 @@ public class QuestHelperPlugin extends Plugin
 	PotionStorage potionStorage;
 
 	@Inject
+	private OCQuestHelperService ocQuestHelperService;
+
+	@Inject
 	public SkillIconManager skillIconManager;
 
 	private QuestHelperPanel panel;
 
 	private NavigationButton navButton;
+
+	private final HotkeyListener nextStepHotkeyListener = new HotkeyListener(() -> config.nextStepHotkey())
+	{
+		@Override
+		public void hotkeyPressed()
+		{
+			executeNextStepAction();
+		}
+	};
 
 	boolean profileChanged;
 
@@ -206,7 +224,7 @@ public class QuestHelperPlugin extends Plugin
 
 		final BufferedImage icon = Icon.QUEST_ICON.getImage();
 
-		panel = new QuestHelperPanel(this, questManager, configManager);
+		panel = new QuestHelperPanel(this, questManager, configManager, ocQuestHelperService);
 		questManager.startUp(panel);
 		navButton = NavigationButton.builder()
 			.tooltip("Quest Helper")
@@ -215,6 +233,7 @@ public class QuestHelperPlugin extends Plugin
 			.panel(panel)
 			.build();
 
+		keyManager.registerKeyListener(nextStepHotkeyListener);
 		clientToolbar.addNavigation(navButton);
 
 		clientThread.invokeAtTickEnd(() -> {
@@ -232,6 +251,7 @@ public class QuestHelperPlugin extends Plugin
 	{
 		runeliteObjectManager.shutDown();
 
+		keyManager.unregisterKeyListener(nextStepHotkeyListener);
 		eventBus.unregister(playerStateManager);
 		eventBus.unregister(runeliteObjectManager);
 		eventBus.unregister(worldMapAreaManager);
@@ -258,6 +278,8 @@ public class QuestHelperPlugin extends Plugin
 		questBankManager.loadInitialStateFromConfig(client);
 		playerStateManager.loadInitialStateFromConfig();
 		questManager.updateQuestState();
+		ocQuestHelperService.onGameTick();
+		panel.refreshNextStepState();
 	}
 
 	@Subscribe
@@ -568,6 +590,12 @@ public class QuestHelperPlugin extends Plugin
 		SwingUtilities.invokeLater(() -> {
 			clientToolbar.openPanel(navButton);
 		});
+	}
+
+	public void executeNextStepAction()
+	{
+		ocQuestHelperService.executeCurrentAction();
+		panel.refreshNextStepState();
 	}
 
 	private void scanAndInstantiate()

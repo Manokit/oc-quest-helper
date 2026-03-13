@@ -296,6 +296,26 @@ public class DetailedQuestStep extends QuestStep
 		setWorldPoint(new WorldPoint(x, y, z));
 	}
 
+	public WorldPoint getWorldPoint()
+	{
+		return definedPoint == null ? null : definedPoint.getWorldPoint();
+	}
+
+	public List<WorldPoint> getLinePoints()
+	{
+		return linePoints == null ? null : Collections.unmodifiableList(linePoints);
+	}
+
+	public List<WorldPoint> getWorldLinePoints()
+	{
+		return worldLinePoints == null ? null : Collections.unmodifiableList(worldLinePoints);
+	}
+
+	public List<QuestTile> getMarkedTiles()
+	{
+		return Collections.unmodifiableList(markedTiles);
+	}
+
 	@Override
 	public void makeWorldOverlayHint(Graphics2D graphics, QuestHelperPlugin plugin)
 	{

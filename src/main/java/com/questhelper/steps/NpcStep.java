@@ -49,6 +49,7 @@ import java.awt.*;
 import java.awt.geom.Line2D;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
 
@@ -181,6 +182,41 @@ public class NpcStep extends DetailedQuestStep
 		return newStep;
 	}
 
+	public int getNpcID()
+	{
+		return npcID;
+	}
+
+	public int getNpcId()
+	{
+		return npcID;
+	}
+
+	public List<Integer> getAlternateNpcIDs()
+	{
+		return Collections.unmodifiableList(alternateNpcIDs);
+	}
+
+	public List<Integer> getAlternateNpcIds()
+	{
+		return Collections.unmodifiableList(alternateNpcIDs);
+	}
+
+	public List<Integer> getAllNpcIds()
+	{
+		return Collections.unmodifiableList(allIds());
+	}
+
+	public String getNpcNameHint()
+	{
+		return npcName;
+	}
+
+	public String getTargetNpcName()
+	{
+		return npcName;
+	}
+
 	protected boolean npcPassesChecks(NPC npc)
 	{
 		if (npcName != null && (npc.getName() == null || !npc.getName().equals(npcName))) return false;
@@ -235,6 +271,11 @@ public class NpcStep extends DetailedQuestStep
 		ids.add(npcID);
 		ids.addAll(alternateNpcIDs);
 		return ids;
+	}
+
+	public String getNpcName()
+	{
+		return npcName;
 	}
 
 	public void setMustBeFocusedOnPlayer(boolean mustBeFocusedOnPlayer)

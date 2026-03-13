@@ -287,6 +287,25 @@ public interface QuestHelperConfig extends Config
 
 	@ConfigSection(
 		position = 0,
+		name = "OC Quest Helper",
+		description = "Controls the hotkey and panel trigger surface for the next quest action"
+	)
+	String ocQuestHelperSection = "ocQuestHelperSection";
+
+	@ConfigItem(
+		position = 0,
+		keyName = "nextStepHotkey",
+		name = "Next Step hotkey",
+		description = "Press to execute the current OC Quest Helper action",
+		section = ocQuestHelperSection
+	)
+	default Keybind nextStepHotkey()
+	{
+		return Keybind.NOT_SET;
+	}
+
+	@ConfigSection(
+		position = 0,
 		name = "Unfinished quest highlights",
 		description = "Highlight things you will need for quests you have not yet completed"
 	)

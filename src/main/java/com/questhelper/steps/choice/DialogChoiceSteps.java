@@ -29,6 +29,7 @@ import net.runelite.api.Client;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 public class DialogChoiceSteps
 {
@@ -43,6 +44,11 @@ public class DialogChoiceSteps
 	public void addChoice(DialogChoiceStep choice)
 	{
 		choices.add(choice);
+	}
+
+	public List<DialogChoiceStep> getChoicesView()
+	{
+		return Collections.unmodifiableList(choices);
 	}
 
 	public void addDialogChoiceWithExclusion(DialogChoiceStep choice, String exclusionString)

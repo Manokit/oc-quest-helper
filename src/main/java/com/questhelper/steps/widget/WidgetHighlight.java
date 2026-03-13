@@ -193,6 +193,31 @@ public class WidgetHighlight extends AbstractWidgetHighlight
 		return this;
 	}
 
+	public int getGroupId()
+	{
+		return interfaceID >> 16;
+	}
+
+	public int getChildId()
+	{
+		return interfaceID & 0xFFFF;
+	}
+
+	public int getChildChildId()
+	{
+		return childChildId;
+	}
+
+	public boolean isCheckChildren()
+	{
+		return checkChildren;
+	}
+
+	public String getNameToCheckFor()
+	{
+		return nameToCheckFor;
+	}
+
 	private boolean itemCheckPasses(Widget widgetToHighlight)
 	{
 		return (itemIdRequirement == null || widgetToHighlight.getItemId() == itemIdRequirement);

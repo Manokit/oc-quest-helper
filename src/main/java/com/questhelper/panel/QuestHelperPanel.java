@@ -26,7 +26,9 @@ package com.questhelper.panel;
 
 import com.questhelper.QuestHelperConfig;
 import com.questhelper.QuestHelperPlugin;
+import com.questhelper.oc.OCPanelState;
 import com.questhelper.managers.QuestManager;
+import com.questhelper.oc.OCQuestHelperService;
 import com.questhelper.panel.skillfiltering.SkillFilterPanel;
 import com.questhelper.questhelpers.BasicQuestHelper;
 import com.questhelper.questhelpers.QuestDetails;
@@ -71,8 +73,13 @@ public class QuestHelperPanel extends PluginPanel
 	private final QuestOverviewPanel questOverviewPanel;
 	private final FixedWidthPanel questOverviewWrapper = new FixedWidthPanel();
 	private final AssistLevelPanel assistLevelPanel = new AssistLevelPanel();
+	private final OCQuestHelperService ocQuestHelperService;
 	private final JTextArea questListMessage;
 	private final JPanel searchQuestsPanel;
+	private final JPanel nextStepSurface = new JPanel();
+	private final JButton nextStepButton = new JButton("Next Step");
+	private final JTextArea nextStepStatus = JGenerator.makeJTextArea();
+	private final JTextArea nextStepDetail = JGenerator.makeJTextArea();
 
 	private final JPanel allDropdownSections = new JPanel();
 	private final JComboBox<Enum> filterDropdown, difficultyDropdown, orderDropdown;
@@ -112,13 +119,15 @@ public class QuestHelperPanel extends PluginPanel
 		EXPANDED_ICON = Icon.EXPANDED.getIcon();
 	}
 
-	public QuestHelperPanel(QuestHelperPlugin questHelperPlugin, QuestManager questManager, ConfigManager configManager)
+	public QuestHelperPanel(QuestHelperPlugin questHelperPlugin, QuestManager questManager, ConfigManager configManager,
+		OCQuestHelperService ocQuestHelperService)
 	{
 		super(false);
 
 		this.questHelperPlugin = questHelperPlugin;
 		this.questManager = questManager;
 		this.configManager = configManager;
+		this.ocQuestHelperService = ocQuestHelperService;
 
 		setBackground(ColorScheme.DARK_GRAY_COLOR);
 		setLayout(new BorderLayout());
@@ -387,10 +396,17 @@ public class QuestHelperPanel extends PluginPanel
 		introDetailsPanel.add(titlePanel, BorderLayout.NORTH);
 		introDetailsPanel.add(searchQuestsPanel, BorderLayout.SOUTH);
 
-		add(introDetailsPanel, BorderLayout.NORTH);
+		JPanel headerPanel = new JPanel();
+		headerPanel.setLayout(new BorderLayout());
+		headerPanel.setBackground(ColorScheme.DARK_GRAY_COLOR);
+		headerPanel.add(introDetailsPanel, BorderLayout.NORTH);
+		headerPanel.add(nextStepSurface, BorderLayout.SOUTH);
+
+		add(headerPanel, BorderLayout.NORTH);
 		add(scrollableContainer, BorderLayout.CENTER);
 
 		/* Layout */
+		configureNextStepSurface();
 		questOverviewPanel = new QuestOverviewPanel(questHelperPlugin, questManager);
 
 		questOverviewWrapper.setLayout(new BorderLayout());
@@ -478,6 +494,32 @@ public class QuestHelperPanel extends PluginPanel
 		}
 
 		refreshSkillFiltering();
+		refreshNextStepState();
+	}
+
+	private void configureNextStepSurface()
+	{
+		nextStepSurface.setLayout(new BorderLayout(0, 6));
+		nextStepSurface.setBorder(new EmptyBorder(10, 10, 4, 10));
+		nextStepSurface.setBackground(ColorScheme.DARK_GRAY_COLOR);
+
+		nextStepButton.setFocusable(false);
+		nextStepButton.addActionListener(e -> questHelperPlugin.executeNextStepAction());
+
+		nextStepStatus.setForeground(Color.WHITE);
+		nextStepStatus.setText("Next Step: Select an active quest");
+
+		nextStepDetail.setForeground(Color.GRAY);
+		nextStepDetail.setText("Configure a hotkey or use this button when a step is resolvable.");
+
+		JPanel nextStepTextPanel = new JPanel();
+		nextStepTextPanel.setLayout(new BorderLayout());
+		nextStepTextPanel.setBackground(ColorScheme.DARK_GRAY_COLOR);
+		nextStepTextPanel.add(nextStepStatus, BorderLayout.NORTH);
+		nextStepTextPanel.add(nextStepDetail, BorderLayout.CENTER);
+
+		nextStepSurface.add(nextStepButton, BorderLayout.NORTH);
+		nextStepSurface.add(nextStepTextPanel, BorderLayout.CENTER);
 	}
 
 	private void onSearchBarChanged()
@@ -612,6 +654,7 @@ public class QuestHelperPanel extends PluginPanel
 		revalidate();
 		repaint();
 		showMatchingQuests(searchBar.getText() != null ? searchBar.getText() : "");
+		refreshNextStepState();
 	}
 
 	public void addQuest(QuestHelper quest, boolean isActive)
@@ -628,6 +671,7 @@ public class QuestHelperPanel extends PluginPanel
 			nextDesiredScrollValue = 0;
 		});
 
+		refreshNextStepState();
 		repaint();
 		revalidate();
 	}
@@ -635,6 +679,7 @@ public class QuestHelperPanel extends PluginPanel
 	public void updateStepsTexts()
 	{
 		questOverviewPanel.updateStepsTexts();
+		refreshNextStepState();
 	}
 
 	public void updateHighlight(Client client, QuestStep newStep)
@@ -657,6 +702,7 @@ public class QuestHelperPanel extends PluginPanel
 		activateQuestList();
 		updateStateDropdown(null);
 
+		refreshNextStepState();
 		repaint();
 		revalidate();
 	}
@@ -697,6 +743,7 @@ public class QuestHelperPanel extends PluginPanel
 		searchQuestsPanel.setVisible(true);
 		allDropdownSections.setVisible(true);
 
+		refreshNextStepState();
 		repaint();
 		revalidate();
 	}
@@ -759,6 +806,7 @@ public class QuestHelperPanel extends PluginPanel
 		if (questHelperPlugin.getClient().getGameState() != GameState.LOGGED_IN || questHelper == null)
 		{
 			deactivateSettings();
+			refreshNextStepState();
 			return;
 		}
 
@@ -773,6 +821,8 @@ public class QuestHelperPanel extends PluginPanel
 			scrollableContainer.setViewportView(assistLevelPanel);
 			searchQuestsPanel.setVisible(false);
 		}
+
+		refreshNextStepState();
 	}
 
 	public void emptyBar()
@@ -808,5 +858,24 @@ public class QuestHelperPanel extends PluginPanel
 		{
 			skillExpandButton.setText(String.format("%d active", numFilteredSkills));
 		}
+	}
+
+	public void refreshNextStepState()
+	{
+		ocQuestHelperService.refreshPanelState(() -> SwingUtilities.invokeLater(this::applyNextStepState));
+	}
+
+	private void applyNextStepState()
+	{
+		OCPanelState panelState = ocQuestHelperService.getPanelState();
+		String label = panelState.getDisplayText();
+		String detail = panelState.getDetailText();
+		boolean executable = panelState.isExecutable();
+
+		nextStepButton.setEnabled(executable);
+		nextStepStatus.setText("Next Step: " + (label == null || label.isBlank() ? "Manual - unresolved step" : label));
+		nextStepDetail.setText(detail == null || detail.isBlank()
+			? (executable ? "Ready to execute with the configured hotkey or this button." : "Manual handling required for the current step.")
+			: detail);
 	}
 }
